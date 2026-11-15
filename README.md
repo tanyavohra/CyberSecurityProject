@@ -35,14 +35,3 @@ python3 auditor.py --help
 
 The output shows a point-in-time snapshot. Re-run it and investigate any `[REVIEW]` line using trusted system utilities and instructor guidance. The auditor performs no remediation.
 
-## Report and submission
-
-Suggested report sections: objective, ethical scope, requirements, method, screenshots/output from the project, findings and limitations, conclusion, source listing, and signed Ethical Declaration. Use the supplied front page and follow the lab brief's required hard-copy/PDF/source-ZIP naming convention: `RollNo_Name_ProjectCode`. Add the GitHub link as required, then prepare for the viva. Do not include passwords, personal data, or real account details in the report.
-
-## Implementation notes
-
-- `/proc/<pid>/comm` supplies process names; inaccessible or already-exited entries are skipped.
-- `ps -e -o pid=,comm=` provides the second process listing.
-- `ss -H -lntu` inventories listening TCP and UDP endpoints.
-- `lsof -nP -i -sTCP:LISTEN` supplies an optional TCP comparison.
-- Only inventory commands are run. The program does not inspect or modify executable memory, hide activity, or alter the host.
