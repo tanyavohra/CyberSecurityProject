@@ -17,9 +17,9 @@ This read-only command-line tool cross-checks the process IDs visible through `/
 - Linux with Python 3.10 or newer
 - `ps` (usually from procps)
 - `ss` (usually from iproute2)
-- Optional: `lsof`
+- `lsof`
 
-No third-party Python packages are required. Run as a normal user first; elevated access is not required for the basic comparison. Permissions may limit visibility.
+No third-party Python packages are required. The script uses Python to read `/proc` and run the Linux commands `ps`, `ss`, and `lsof`. Run as a normal user; do not use `sudo` for the auditor.
 
 ## Run
 
@@ -35,15 +35,9 @@ python3 auditor.py --help
 
 The output shows a point-in-time snapshot. Re-run it and investigate any `[REVIEW]` line using trusted system utilities and instructor guidance. The auditor performs no remediation.
 
-## Suggested isolated demo
-
-Follow the step-by-step [live demo guide](LIVE_DEMO.md). It uses Python's built-in HTTP server bound to `127.0.0.1` on port `8765`, so the demo listener stays local to the Linux VM.
-
-Do not bind the demo service to a public interface or forward its port outside the isolated lab.
-
 ## Report and submission
 
-Suggested report sections: objective, ethical scope, requirements, method, screenshots/output from the isolated demo, findings and limitations, conclusion, source listing, and signed Ethical Declaration. Use the supplied front page and follow the lab brief's required hard-copy/PDF/source-ZIP naming convention: `RollNo_Name_ProjectCode`. Add the GitHub link as required, then prepare for the live demo and viva. Do not include passwords, personal data, or real account details in the report.
+Suggested report sections: objective, ethical scope, requirements, method, screenshots/output from the project, findings and limitations, conclusion, source listing, and signed Ethical Declaration. Use the supplied front page and follow the lab brief's required hard-copy/PDF/source-ZIP naming convention: `RollNo_Name_ProjectCode`. Add the GitHub link as required, then prepare for the viva. Do not include passwords, personal data, or real account details in the report.
 
 ## Implementation notes
 
