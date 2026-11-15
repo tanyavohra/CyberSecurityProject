@@ -10,16 +10,30 @@ def get_processes_from_proc():
     processes = {}
     for entry in os.listdir("/proc"):
         if entry.isdigit():
-            file = open("/proc/" + entry + "/comm")
-            processes[int(entry)] = file.read().strip()
-            file.close()
+            try:
+                with open("/proc/" + entry + "/comm") as file:
+                    processes[int(entry)] = file.read().strip()
+            except (FileNotFoundError, ProcessLookupError, PermissionError):
+                # Processes can exit or become unreadable while /proc is scanned.
+                continue
     return processes
 
 
+def run_command(command, package):
+    try:
+        return subprocess.run(
+            command, capture_output=True, text=True, check=False
+        ).stdout
+    except FileNotFoundError:
+        print(
+            f"[ERROR] Required command '{command[0]}' was not found; "
+            f"install {package}."
+        )
+        raise SystemExit(1)
+
+
 def get_processes_from_ps():
-    output = subprocess.run(
-        ["ps", "-e", "-o", "pid=,comm="], capture_output=True, text=True
-    ).stdout
+    output = run_command(["ps", "-e", "-o", "pid=,comm="], "procps")
     processes = {}
     for line in output.splitlines():
         match = re.match(r"\s*(\d+)\s+(.*)", line)
@@ -29,9 +43,7 @@ def get_processes_from_ps():
 
 
 def get_ports_from_ss():
-    output = subprocess.run(
-        ["ss", "-H", "-lntu"], capture_output=True, text=True
-    ).stdout
+    output = run_command(["ss", "-H", "-lntu"], "iproute2")
     tcp_ports = set()
     udp_ports = set()
 
@@ -49,9 +61,7 @@ def get_ports_from_ss():
 
 
 def get_ports_from_lsof():
-    output = subprocess.run(
-        ["lsof", "-nP", "-i", "-sTCP:LISTEN"], capture_output=True, text=True
-    ).stdout
+    output = run_command(["lsof", "-nP", "-i", "-sTCP:LISTEN"], "lsof")
     ports = set()
     for line in output.splitlines()[1:]:
         match = re.search(r"(?:\*|\[[^]]+\]|[^\s:]+):(\d+)\s+\(LISTEN\)", line)
@@ -65,6 +75,10 @@ def main():
 
     proc_processes = get_processes_from_proc()
     ps_processes = get_processes_from_ps()
+    # ps itself (and its short-lived helpers) starts after the first /proc scan.
+    # Include a second scan so those newly started processes are represented.
+    proc_processes_after_ps = get_processes_from_proc()
+    proc_processes.update(proc_processes_after_ps)
     print(f"Processes visible in /proc: {len(proc_processes)}")
 
     proc_only = proc_processes.keys() - ps_processes.keys()
