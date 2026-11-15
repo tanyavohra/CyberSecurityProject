@@ -23,15 +23,13 @@ No third-party Python packages are required. The script uses Python to read `/pr
 
 ## Run
 
-```bash
+```wsl
+sudo apt update
+sudo apt install python3 procps iproute2 lsof
+cd <File Path>
 python3 auditor.py
 ```
 
-To check command options:
-
-```bash
-python3 auditor.py --help
-```
 
 The output shows a point-in-time snapshot. Re-run it and investigate any `[REVIEW]` line using trusted system utilities and instructor guidance. The auditor performs no remediation.
 
